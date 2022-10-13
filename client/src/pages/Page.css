@@ -1,20 +1,8 @@
-.page-container{
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    max-height: 800px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.ctn {
+  padding: 2rem;
+  box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
-.ctn{
-    padding: 2rem;
-    box-shadow: 1px 5px 10px rgba(0,0,0,0.5);
-}
-
-
-.w{
-    width: 85% !important;
+.w {
+  width: 85% !important;
 }
