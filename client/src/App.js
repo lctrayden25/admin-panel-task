@@ -3,8 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
-  Navigate,
+  Navigate
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -17,6 +16,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from "./store/UserStore";
 import { useState } from "react";
 
+
 function App() {
   const [user, setUser] = useState(undefined);
 
@@ -27,18 +27,22 @@ function App() {
           <Router>
             <Routes>
               {/* Public */}
+              
               <Route
                 index
                 path="/"
                 element={<Login onSuccess={(user) => setUser(user)} />}
               />
-              <Route path="/register" element={<Register />} />
+              <Route path="/register" element={< Register />} />
+
               {/* Member */}
-              <Route path="/admin/:id" element={<Admin />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/detail/:id" element={<Detail />} />
-              <Route path="/edit/:id" element={<Edit />} />
+              <Route path="/admin/:id" element={!user ? <Navigate to='/' /> : <Admin /> } />
+              <Route path="/profile/:id" element={!user ? <Navigate to='/' />  :<Profile />} />
+              <Route path="/detail/:id" element={!user ? <Navigate to='/' />  : <Detail />} />
+              <Route path="/edit/:id" element={!user ? <Navigate to='/' />  : <Edit />} />
+              <Route path="*" element={<Navigate to="/" replace />}/>
             </Routes>
+
           </Router>
         </UserProvider>
       </ChakraProvider>

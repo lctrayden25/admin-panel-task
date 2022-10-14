@@ -7,61 +7,53 @@ import {
   Input,
   Text,
   Button,
+  FormErrorMessage
 } from "@chakra-ui/react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { apiEndpoint } from "../utils/constant";
 
 const Register = () => {
-  const [data, setData] = useState({
-    name: "",
-    password: "",
-    email: "",
-    role: "User",
-  });
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    let newData = { ...data };
-    newData[e.target.id] = e.target.value;
-    setData(newData);
-    // console.log(newData);
-  };
+  const [name, setName] = useState();
+  const [password, setPassword] = useState();
+  const [email, setEmail] = useState();
+  const [cpassword, setCpassword] = useState();
+  const [errorMsg, setErrorMsg ] = useState(); 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let error = document.getElementById("error");
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-    let cpassword = document.getElementById("cpassword").value;
 
-    if (name == "" || email == "" || password == "" || cpassword == "") {
-      error.style.display = "block";
-      error.innerHTML = "All fields are required";
+    if(password !== cpassword){
+      setErrorMsg('Two password are not same.');
       return;
-    } else if (password !== cpassword) {
-      error.style.display = "block";
-      error.innerHTML = "Please make sure your passwords are same.";
-      return;
-    } else {
-      error.style.display = "none";
+    }
 
-      axios({
+    try{
+
+      const res = await axios({
         method: "post",
         url: `${apiEndpoint}/register`,
-        data: data,
+        data: {
+          name,
+          password,
+          email,
+        },
       })
-        .then((res) => {
-          console.log(res);
-          if (res.status == 200 && res.statusText == "OK") {
-            window.location.href = "/";
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+
+      if (res.status === 200 && res.statusText === "OK") {
+        navigate('/')
+      }
+
+    } catch ( err) {
+        console.log(err);
+        let res = err.response;
+        let msg = res.data.message;
+        setErrorMsg(msg);
     }
+    
   };
 
   return (
@@ -70,48 +62,54 @@ const Register = () => {
         <Text fontSize="4xl" mb={4}>
           Register
         </Text>
-        <FormLabel id="error"></FormLabel>
-        <FormControl mb="3">
+        {/* <FormLabel id="error">{errorMsg}</FormLabel> */}
+        <FormControl mb="3" isRequired >
           <FormLabel>Display Name</FormLabel>
           <Input
             type="text"
             name="name"
             id="name"
             placeholder="Your display name"
-            onChange={(e) => handleChange(e)}
-            value={data.name}
+            onChange={(e) => setName(e.target.value)}
+            value={name}
           />
+          {/* <FormErrorMessage>{errorMsg}</FormErrorMessage> */}
         </FormControl>
-        <FormControl mb="3">
+        <FormControl mb="3" isRequired >
           <FormLabel>Email</FormLabel>
           <Input
             type="email"
             name="email"
             id="email"
             placeholder="Email"
-            onChange={(e) => handleChange(e)}
-            value={data.email}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
+          {/* <FormErrorMessage>{errorMsg}</FormErrorMessage> */}
         </FormControl>
-        <FormControl mb="3">
+        <FormControl mb="3" isRequired >
           <FormLabel>Password</FormLabel>
           <Input
             type="password"
             name="password"
             id="password"
             placeholder="Password"
-            onChange={(e) => handleChange(e)}
-            value={data.password}
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
           />
+          {/* <FormErrorMessage>{errorMsg}</FormErrorMessage> */}
         </FormControl>
-        <FormControl>
+        <FormControl isRequired isInvalid={errorMsg}>
           <FormLabel>Password Confirm</FormLabel>
           <Input
             type="password"
             name="cpassword"
             id="cpassword"
             placeholder="Confirm password"
+            onChange={(e) => setCpassword(e.target.value)}
+            value={cpassword}
           />
+          <FormErrorMessage>{errorMsg}</FormErrorMessage>
         </FormControl>
         <VStack
           spacing={5}

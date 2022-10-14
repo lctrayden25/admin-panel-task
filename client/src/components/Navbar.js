@@ -1,28 +1,19 @@
 import React, { useContext } from "react";
-import { Grid, GridItem } from "@chakra-ui/react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { useState, useEffect } from "react";
 import { UserContext } from "../store/UserStore";
-// import axios from 'axios'
 
 const Navbar = () => {
   const { user = {} } = useContext(UserContext);
-
-  const { name = "", _id: id = "" } = user;
+  const { name = "", _id: id = "", role } = user;
 
   return (
-    <NavWrapper>
+    <NavWrapper> 
       <NavList>
-        <li>
-          <Link to={`/profile/${id}`}>Profile</Link>
-        </li>
-        <li>
-          <Link to={`/admin/${id}`}>Admin Panel</Link>
-        </li>
-        <li>
-          <Link to="/">Logout</Link>
-        </li>
+        <li><Link to={`/profile/${id}`}>Profile</Link></li>
+        { role === 'Admin' ? <li><Link to={`/admin/${id}`}>Admin Panel</Link></li> : null }
+        <li><Link to="/">Logout</Link></li>
+        <li>{role}</li>
       </NavList>
       <h3>{name}</h3>
     </NavWrapper>
@@ -69,6 +60,15 @@ const NavList = styled.div`
     margin: 0.3rem 0;
     color: #000;
     box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.2);
+
+    &:last-child{
+      margin-top: 1rem;
+      box-shadow: none;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+    }
 
     &:hover {
       background: #000;

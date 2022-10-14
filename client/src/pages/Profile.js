@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { Text, Container, HStack, Button, Box, Flex } from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
 import { FormControl, FormLabel } from "@chakra-ui/react";
+import { apiEndpoint } from "../utils/constant";
 
-import Navbar from "../conponents/Navbar";
+import Navbar from "../components/Navbar";
 import "./Page.css";
 
 const Profile = () => {
@@ -14,7 +15,7 @@ const Profile = () => {
   let user_id = params.id;
 
   const getUser = useCallback(async () => {
-    let api = await fetch("http://localhost:3001/admin/" + user_id);
+    let api = await fetch(`${apiEndpoint}/admin/${user_id}`);
     let data = await api.json();
     if (data) {
       setUser(data);

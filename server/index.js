@@ -13,11 +13,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 mongoose.connect(
-  `mongodb+srv://Rayden:54867997@cluster0.sa1vgny.mongodb.net/?retryWrites=true&w=majority`,
+  process.env.DB_LINK,
   () => {
     console.log("Connected.");
   }
-);
+); 
 
 app.get("/", (req, res) => {
   res.send("HOME");
@@ -26,6 +26,7 @@ app.get("/", (req, res) => {
 // user register
 app.post("/register", async (req, res) => {
   const data = req.body;
+  console.log(data);
   const isRegister = await User.findOne({ email: data.email });
 
   if (isRegister) {
@@ -36,8 +37,9 @@ app.post("/register", async (req, res) => {
   } else {
     const userRegister = await User.create({
       ...data,
-      status: "Pending",
-      createAt: new Date().now(),
+      status: "N/A",
+      role: 'User',
+      createAt: Date.now(),
     });
     res.status(200).json({
       message: "User register successfully.",
@@ -49,6 +51,7 @@ app.post("/register", async (req, res) => {
 //user login
 app.post("/login", async (req, res) => {
   const data = req.body;
+  console.log(data);
   const user = await User.findOne({
     email: data.email,
     password: data.password,
@@ -93,6 +96,7 @@ app.get("/admin", async (req, res) => {
 //edit user
 app.post("/edit/:id", async (req, res) => {
   const data = req.body;
+  data['status'] = 'Pending';
   const userEdit = await User.findByIdAndUpdate(data._id, data);
   console.log(userEdit);
   if (userEdit) {
@@ -122,7 +126,9 @@ app.post("/status/:id", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
+
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

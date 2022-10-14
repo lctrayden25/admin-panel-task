@@ -15,7 +15,7 @@ import axios from "axios";
 
 import { apiEndpoint } from "../utils/constant";
 
-import Navbar from "../conponents/Navbar";
+import Navbar from "../components/Navbar";
 import "./Page.css";
 
 const UserStatusStyle = {
@@ -83,7 +83,7 @@ const Admin = () => {
     <HStack mt="10" mb="10">
       <Container maxW="1000px" w="85%" className="ctn">
         <Flex
-          gap="20"
+          gap="5"
           direction={["column", "column", "column", "row", "row"]}
           justifyContent={"center"}
         >

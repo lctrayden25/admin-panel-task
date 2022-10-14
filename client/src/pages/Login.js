@@ -19,7 +19,6 @@ const Login = ({ onSuccess = () => undefined }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e) => {
@@ -40,10 +39,8 @@ const Login = ({ onSuccess = () => undefined }) => {
       }
     } catch (err) {
       console.log(err);
-
       let res = err.response;
       let msg = res.data.message;
-
       setErrorMsg(msg);
     }
   };

@@ -1,11 +1,8 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Grid,
-  GridItem,
   Text,
   Container,
-  VStack,
   HStack,
   Button,
   Flex,
@@ -15,8 +12,6 @@ import {
 import {
   FormControl,
   FormLabel,
-  FormErrorMessage,
-  FormHelperText,
   Input,
 } from "@chakra-ui/react";
 import {
@@ -28,13 +23,11 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Hide,
-  Show,
 } from "@chakra-ui/react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
-import Navbar from "../conponents/Navbar";
+import { apiEndpoint } from "../utils/constant";
+import Navbar from "../components/Navbar";
 import "./Page.css";
 
 const Detail = () => {
@@ -49,111 +42,68 @@ const Detail = () => {
     onClose: onCloseReject,
   } = useDisclosure();
 
-  let [single, setSingle] = useState();
-  // let [status, setStatus] = useState();
-  let params = useParams();
+  const [user, setUser] = useState();
+  const params = useParams();
   let user_id = params.id;
+  const navigate = useNavigate();
 
-  // const getUser = () => {
-  //   axios({
-  //       method: 'GET',
-  //       url: 'http://localhost:3001/admin/',
-  //   })
-  //   .then( res => {
-  //       let all_user = res.data;
-  //       // single = all_user.filter( user => user._id !== user_id);
-  //       // console.log(single);
-  //       if(Array.isArray(all_user)){
-  //         all_user.filter( user => {
-  //           if(user._id == user_id){
-  //             single = user;
-  //           }
-  //         })
-  //       }else{
-  //         return null;
-  //       }
-  //       setSingleUser(singleUser);
-  //   })
-  //   .catch( err => {
-  //       console.log(err);
-  //   })
+  const handleApproveSubmit = async(e) => {
+      e.preventDefault();
+      try{
+          let res = await axios({
+            method: "post",
+            url: `http://localhost:3001/status/${user_id}`,
+            data: {
+              status: "Approve",
+              id: user_id,
+            }
+          })
+          if (res.status == 200) {
+            navigate(`/admin/${user_id}`);
+          }
 
-  //   console.log(singleUser)
-
-  // }
-
-  const handleApproveSubmit = (e) => {
-    e.preventDefault();
-    axios({
-      method: "post",
-      url: `http://localhost:3001/status/${user_id}`,
-      data: {
-        status: "Approve",
-        id: user_id,
-      },
-    })
-      .then((res) => {
-        console.log(res);
-        if (res.status == 200) {
-          window.location.href = `/admin/${user_id}`;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      }catch(err){
+          console.log(err)
+      }
   };
 
-  const handleRejectSubmit = (e) => {
+  const handleRejectSubmit = async (e) => {
     e.preventDefault();
-    axios({
-      method: "post",
-      url: `http://localhost:3001/status/${user_id}`,
-      data: {
-        status: "Reject",
-        id: user_id,
-      },
-    })
-      .then((res) => {
-        console.log(res);
+    try{
+        let res = await axios({
+          method: "post",
+          url: `http://localhost:3001/status/${user_id}`,
+          data: {
+            status: "Reject",
+            id: user_id,
+          }
+        })
         if (res.status == 200) {
-          window.location.href = `/admin/${user_id}`;
+          navigate(`/admin/${user_id}`);
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }catch(err){
+        console.log(err)
+    }
   };
 
-  const getUser = async () => {
-    let api = await fetch("http://localhost:3001/admin");
+  const getUser = useCallback( async () => {
+    let api = await fetch(`${apiEndpoint}/admin/${user_id}`);
     let data = await api.json();
-    if (data && typeof data !== "undefined") {
-      getUserData(data);
+    if (data) {
+      setUser(data);
     }
-  };
-
-  const getUserData = (data) => {
-    let userData = {};
-    userData = data.find((user) => user_id == user._id);
-    if (userData !== "undefined") {
-      setSingle(userData);
-    }
-  };
+  }, [user_id]);
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [getUser]);
 
-  if (single == undefined) {
-    return null;
-  }
-
-  return (
+  return user ? (
     <HStack mt="10">
       <Container maxW="550px" className="ctn w">
         <Flex gap={10} direction={["column", "column", "row", "row", "row"]}>
           <Box colSpan={3}>
-            <Navbar name={single.name} id={user_id} />
+            <Navbar name={user.name} id={user_id} />
           </Box>
           <Box colSpan={5}>
             <Container>
@@ -177,12 +127,12 @@ const Detail = () => {
             <Container>
               <FormControl mb="10">
                 <FormLabel fontSize="xl">Display Name</FormLabel>
-                <Text>{single.name}</Text>
+                <Text>{user.name}</Text>
               </FormControl>
 
               <FormControl mb="10">
                 <FormLabel fontSize="xl">Email</FormLabel>
-                <Text>{single.email}</Text>
+                <Text>{user.email}</Text>
               </FormControl>
 
               <Container>
@@ -249,7 +199,7 @@ const Detail = () => {
         </Flex>
       </Container>
     </HStack>
-  );
+  ) : null;
 };
 
 export default Detail;
